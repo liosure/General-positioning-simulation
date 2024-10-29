@@ -6,14 +6,14 @@ classdef Chl
     end
     
     methods(Static)
-        function CHL_LoS = Los(tx,rx,c,fc,fd)
+        function CSI_LoS = Los(tx,rx,c,fc,fd)
             [r,azi,ele] = Phy_cal(tx.pos,rx.pos);
-            PL = sqrt()
+            PL = sqrt(*G_t*G_r/r^2)
             del = r/c;
-            dop = 
+            dop = v/c*fc;
             
             
-            CHL_LoS = tx-rx;
+            CSI_LoS = {Tap_chl, TF_chl, del, dop, azi, ele};
         end
         
         function CHL_Ref = Ref(tx,rx,blk)

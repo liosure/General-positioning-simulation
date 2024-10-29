@@ -5,6 +5,7 @@ classdef Transmiter
     properties
         Num_trans_ant %发射天线数
         Num_trans_ant_type
+        Trans_ant_opt
         Ant_pos
         Num_subc
         Num_sym
@@ -17,10 +18,10 @@ classdef Transmiter
             %初始化TRANSMITER, 包括发射天线数，载波数，符号数，位置
             obj.Num_trans_ant = cell2mat(NTA(1));
             obj.Num_trans_ant_type = cell2mat(NTA(2));
+            obj.Trans_ant_opt = NTA{3};
             obj.Num_subc = NSC;
             obj.Num_sym = NS;
             obj.Loc = LC;
-            obj.Ant_pos = 
         end
         
         function obj = Data_generate(obj,varargin)
@@ -57,7 +58,7 @@ classdef Transmiter
             end
         end
         
-        function st = Signal_generate(obj,vargin)
+        function st = Signal_generate(obj,varargin)
             % 输入参数为0-4个，由cp长度，导频类型，是否otfs调制，是否reduced-cp结构组成
             % 下为缺省量
             OTFS_flag = false;
@@ -65,22 +66,22 @@ classdef Transmiter
             Len_cp = obj.Num_subc/8;
             RECP_flag = false;
             
-            if exist('vargin','var')
-                switch numel(vargin)
+            if exist('varargin','var')
+                switch numel(varargin)
                     case 1
-                        Len_cp = vargin(1);
+                        Len_cp = cell2mat(varargin(1));
                     case 2
-                        Len_cp = vargin(1);
-                        Plt_func = vargin(2);
+                        Len_cp = cell2mat(varargin(1));
+                        Plt_func = cell2mat(varargin(2));
                     case 3
-                        Len_cp = vargin(1);
-                        Plt_func = vargin(2);
-                        OTFS_flag = vargin(3);
+                        Len_cp = cell2mat(varargin(1));
+                        Plt_func = cell2mat(varargin(2));
+                        OTFS_flag =cell2mat( varargin(3));
                     case 4
-                        Len_cp = vargin(1);
-                        Plt_func = vargin(2);
-                        OTFS_flag = vargin(3);
-                        RECP_flag = vargin(4);
+                        Len_cp = cell2mat(varargin(1));
+                        Plt_func = cell2mat(varargin(2));
+                        OTFS_flag = cell2mat(varargin(3));
+                        RECP_flag = cell2mat(varargin(4));
                 end
             end
             
@@ -113,6 +114,19 @@ classdef Transmiter
             
         end
         
+        function obj = Ant_gen(obj, spacing)
+            Num_array = cell2mat(obj.Trans_ant_opt(1));
+            if Num_array == 1
+                varargin = obj.Trans_ant_opt{2};
+                obj.Ant_pos = feval(obj.Num_trans_ant_type, obj.Loc, spacing, obj.Num_trans_ant, varargin);
+            elseif Num_array ==2
+                varargin = obj.Trans_ant_opt{2};
+                obj.Ant_pos(:,:,1) = feval(obj.Num_trans_ant_type, obj.Loc, spacing, obj.Num_trans_ant, varargin);
+                varargin = obj.Trans_ant_opt{3};
+                obj.Ant_pos(:,:,2) = feval(obj.Num_trans_ant_type, obj.Loc, spacing, obj.Num_trans_ant, varargin);
+            end
+        end
+        
         function Trans_BF = Beam_forming(BFtype,CHL,noise)
             Trans_BF = feval(BFtype,CHL,noise);
         end
@@ -131,15 +145,21 @@ classdef Transmiter
             hold(axes1,'on');    
             plot3(obj.Loc(1),obj.Loc(2),obj.Loc(3),'Marker','^','LineStyle','none','Color',[0 0 1]);
             view(axes1,[-37.5 30]);
-            
         end
         
         function cell_plot(obj,fig,r)
             figure(fig)
             theta = linspace(pi/2, 2.5*pi, 7);
-            x = obj.Loc(1) + [sqrt(3)*r/2 + r * cos(theta), -sqrt(3)*r/2 + r * cos(theta([6:7,1:5]))]; % x 坐标
-            y = obj.Loc(2) + [r/2 +  r * sin(theta), r/2 +  r * sin(theta([6:7,1:5]))]; % y 坐标
-            plot(x, y, 'c:', 'LineWidth', 1.5);
+            cell_num = cell2mat(obj.Trans_ant_opt(1));
+            if cell_num == 1
+                x = obj.Loc(1) + sqrt(3)*r/2 + r * cos(theta); % x 坐标
+                y = obj.Loc(2) + r/2 +  r * sin(theta); % y 坐标
+                plot(x, y, 'c:', 'LineWidth', 1.5);
+            elseif cell_num == 2
+                x = obj.Loc(1) + [sqrt(3)*r/2 + r * cos(theta), -sqrt(3)*r/2 + r * cos(theta([6:7,1:5]))]; % x 坐标
+                y = obj.Loc(2) + [r/2 +  r * sin(theta), r/2 +  r * sin(theta([6:7,1:5]))]; % y 坐标
+                plot(x, y, 'c:', 'LineWidth', 1.5);
+            end
         end
     end
 end

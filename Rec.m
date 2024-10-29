@@ -12,6 +12,7 @@ classdef Rec
         Sig
         Marker_map
         Color_map
+        Ant_pos
     end
     
     methods
@@ -48,6 +49,23 @@ classdef Rec
         
         function obj = Par_est(obj)
             %主链路通信            
+        end
+        
+        function obj = Ant_gen_TX(obj, spacing,opt)
+            Num_array = opt{1};
+            if Num_array == 1
+                varargin = opt{2};
+                obj.Ant_pos = feval(obj.Num_rec_ant_type, obj.Loc, spacing, obj.Num_rec_ant, varargin);
+            elseif Num_array ==2
+                varargin = opt{2};
+                obj.Ant_pos(:,:,1) = feval(obj.Num_rec_ant_type, obj.Loc, spacing, obj.Num_rec_ant, varargin);
+                varargin = opt{3};
+                obj.Ant_pos(:,:,2) = feval(obj.Num_rec_ant_type, obj.Loc, spacing, obj.Num_rec_ant, varargin);
+            end
+        end
+        
+        function obj = Ant_gen(obj, spacing,opt)
+            obj.Ant_pos = feval(obj.Num_rec_ant_type, obj.Loc, spacing, obj.Num_rec_ant, opt);
         end
         
         function disp2d(obj,fig)

@@ -11,10 +11,15 @@ classdef Backcom < Target
     end
     
     methods
-        function obj = Backcom(ref, Delay, Target)
+        function obj = Backcom(ref, Delay, Target, BA)
             obj.Loc = Target.Loc;
             obj.Prcs_delay = Delay;
             obj.Ref_coef = ref;
+            
+        end
+        
+        function obj = Ant_gen(obj, spacing,opt)
+            obj.Ant_pos = feval(obj.Num_bc_ant_type, obj.Loc, spacing, obj.Num_bc_ant, opt);
         end
         
         function obj = BD_sig_gen(obj,tx,varargin)

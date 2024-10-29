@@ -1,4 +1,4 @@
-function Pos = cell_rand_pos_gen(Pos_slec_vec,r,r_cell)
+function Pos = cell_rand_pos_gen(Pos_slec_vec,r,r_cell,cell_num)
 % Uniform pick pos in one cell 
 % Pos_slec_vec is pre_input location of the vertex in one cell
 % r is the radius of the random point
@@ -10,7 +10,10 @@ function Pos = cell_rand_pos_gen(Pos_slec_vec,r,r_cell)
         r2 = 1 - r2;
     end
     Pos = Pos_slec_vec(1,:) + r1*Pos_slec_vec(Area_slec+2,:)*r/r_cell + r2*Pos_slec_vec(Area_slec+3,:)*r/r_cell;
-    P_slec = 2*randi(2,1)-3;
+    P_slec = 1;
+    if cell_num == 2
+        P_slec = 2*randi(2,1)-3;
+    end
     Pos = Pos + [P_slec*sqrt(3)*r/2,r/2,0] ;
 end
 
