@@ -5,16 +5,16 @@ addpath(allpath);
 %% initial parameter
 for i = 1
     %% Physic parameter
-    c = 3e8; fc = 5.5e9; fd = 8*1.5e4;
+    c = 3e8; fc_DL = 5.5e9; fd = 8*1.5e4; fc_UL = 4e9;
     %% system_configuration
-    Num_BS = 4; cell_num = floor(Num_BS/2); R_cell = 250;
+    Num_BS = 2; cell_num = floor(Num_BS/2); R_cell = 250;
     CP_len = 16; M_order = 16; %CP长度，调制阶数
     Num_ta = {32,'ULA',{cell_num,{'h',30},{'h',150}}}; Num_subc = 128; Num_sym = 64;
     BW = Num_subc*128*fd; T_t = (Num_subc+CP_len)/BW; TW = (Num_subc+CP_len)/BW*Num_sym;% 基本参数
     Num_user = 4; Num_clt = 20;Num_uav_clt = 2;Uav_clt = [8,10];
     %BS 2 - 6 % 用户数 % 环境障碍物 % 无人机集群数 % 各集群无人机数目
     Num_ra_bs = {32,'ULA'};Num_ra_ue = {4,'ULA'};  %BS 32R 用户 4R
-    BS_pos = [[0,0,0];[real(sqrt(3)*R_cell*exp(1j*2*pi/6.*(0:5).')),imag(sqrt(3)*R_cell*exp(1j*2*pi/6.*(0:5).')),zeros(6,1)]];
+    BS_pos = [[0,0,10];[real(sqrt(3)*R_cell*exp(1j*2*pi/6.*(0:5).')),imag(sqrt(3)*R_cell*exp(1j*2*pi/6.*(0:5).')),zeros(6,1)]];
     Pos_slec_vec = Area_pos_gen_func([0,0,0],sqrt(3)*R_cell/2); direcion = [150, 270, 270, 30];
     Sim_t = 64; Time_step = T_t; P_rcs = 1; Ant_spc = 0.5*c/fc; %Antenna Spacing
     %% simulation setup
@@ -25,7 +25,7 @@ end
 %% Class generation
 for i = 1
     %% Tx % 初始化TRANSMITER, 依次为发射天线数，载波数，符号数，位置
-    Tx = Transmiter(Num_ta,Num_subc,Num_sym,[0,0,0]); 
+    Tx = Transmiter(Num_ta,Num_subc,Num_sym,[0,0,20],[0,0,0]); 
     BF = ones(Tx.Num_trans_ant,1); %预分配内存使用的临时变量
     Tx = Tx.Data_generate('qammod',M_order,true,'gray');
     size_st = size(BF*Tx.Signal_generate(4+CP_len).');
@@ -78,7 +78,7 @@ for ue_idx = 1:Num_user
     Opt = {'v',360*rand(1,1)}; 
     UE(ue_idx) = UE(ue_idx).Ant_gen(Ant_spc,Opt);
 end
-
+ [r,azi,ele] = Phy_cal(Tx,BS(2));
 
 
 %% Rec signal generator

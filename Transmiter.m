@@ -11,10 +11,13 @@ classdef Transmiter
         Num_sym
         X_data
         Loc
+        Vel
+        G_t
+        G_r
     end
     
     methods
-        function obj = Transmiter(NTA,NSC,NS,LC)
+        function obj = Transmiter(NTA,NSC,NS,LC,Options)
             %初始化TRANSMITER, 包括发射天线数，载波数，符号数，位置
             obj.Num_trans_ant = cell2mat(NTA(1));
             obj.Num_trans_ant_type = cell2mat(NTA(2));
@@ -22,6 +25,9 @@ classdef Transmiter
             obj.Num_subc = NSC;
             obj.Num_sym = NS;
             obj.Loc = LC;
+            obj.Vel = cell2mat(Options{1});
+            obj.G_t = cell2mat(Options{2});
+            obj.G_r = cell2mat(Options{3});
         end
         
         function obj = Data_generate(obj,varargin)
